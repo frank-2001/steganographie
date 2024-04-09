@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+  <script src="src/3.4.3.js"></script>
+  <!-- <link rel="stylesheet" href="src/style.css"> -->
+</head>
+<body class="grid bg-blue-100 color-black">
+ <header class="flex center bg-blue-500 justify-between text-white px-10 py-5">
+    <span>
+        Steganography system
+    </span>
+    <div class="flex gap-5">
+      <button id="btnencrypt" onclick="tab('encrypt')" class="px-5 py-2 p-10 rounded bg-black text-white hover:bg-black hover:text-white easy-out duration-300 cursor-pointer">Encrypt</button>
+      <button id="btndecrypt" onclick="tab('decrypt')" class="px-5 py-2 p-10 rounded bg-black text-white hover:bg-black hover:text-white easy-out duration-300 cursor-pointer">Decrypt</button>
+    </div>
+ </header>
+ <section class="grid p-10">
+  
+  <div class="h-screen">
+    <h2 class="text-center pb-8 font-bold text-lg" id="title">ENCRYPT</h2>
+    <div class="flex justify-evenly items-start">
+
+      <form id="encrypt" class="w-96 gap-2 grid" enctype="multipart/form-data">
+        <input type="hidden" id="action" name="action">
+        <fieldset class="grid">
+          <span>Image</span>
+          <input type="file" required class="img" name="image">  
+        </fieldset>
+        <fieldset class="grid textarea-d">
+          <span>Code</span>
+          <input type="number" name="code" id="">
+        </fieldset>
+        <fieldset class="grid textarea">
+          <span>Message</span>
+          <textarea id="" cols="30" name="message" rows="10"></textarea>
+        </fieldset>
+        <button class="bg-blue-500 text-white px-5 py-2 rounded">Valider</button>
+      </form>
+
+      <div class="bg-black w-96 rounded text-white p-5" id="result">
+        <div id="imgs">
+          
+        </div>
+        <div id="text">
+          Result
+        </div>
+      </div>
+    </div>
+  </div>
+ </section>
+</body>
+</html>
+<script src="src/jquery-3.7.1.min.js"></script>
+<script>
+
+  
+  let mode=""
+  function tab(id) {
+    
+    $("#result").html(`
+      <div id="imgs">
+          
+        </div>
+        <div id="text">
+          Result
+        </div>
+  
+  `);
+    if (id=="encrypt") {
+      $('.textarea').show(); 
+      $('.textarea-d').hide();  
+    }else{
+      $('.textarea-d').show(); 
+      $('.textarea').hide();
+    }
+    
+    $('body>header>div>button').toggleClass('bg-white text-white bg-black text-black');
+    // $('#'+id).toggle();
+    $("#title").text(id.toUpperCase());
+    $("#action").val(id);
+    $('#btn'+id).removeClass('bg-white text-black');
+    $('#btn'+id).addClass('bg-black text-white');
+  }
+  tab('encrypt')
+
+  var input = document.querySelector('.img');
+  input.addEventListener("change", function (element) {
+  // Obtenir l'image sélectionnée
+  let file = element.target.files[0];
+  let reader = new FileReader();
+  reader.onloadend = function() {
+      $("#result>#imgs").html(`<img class="img-thumbnail rounded mt-2" src="${reader.result}" alt="Image">`);
+  }
+  reader.readAsDataURL(file);
+  });
+
+  $("form").submit(function (e) { 
+    e.preventDefault();
+    let form = new FormData(this)
+    $.ajax({
+      type: "POST",
+      url: "app.php",
+      data: form,
+      contentType: false,
+      processData: false,
+      success: function (response) {
+        $("#text").html(response);
+        console.log(response);
+      },
+      error : function (error) {
+        $("#text").text(error.responseText);
+          console.error(error);
+      }
+    });
+  });
+
+</script>
